@@ -49,4 +49,9 @@ const setup = async () => {
   )
 }
 
-setup()
+(async () => {
+  const healthStatus = (await client.health()).status;
+  if (healthStatus === 'available') {
+    await setup();
+  }
+})();
