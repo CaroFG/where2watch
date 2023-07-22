@@ -50,21 +50,21 @@ const setup = async () => {
 }
 
 
-// const waitForVariableToBeSet = (variable) => {
-//   return new Promise((resolve, reject) => {
-//     // Check the variable at regular intervals
-//     const checkInterval = setInterval(() => {
-//       if (variable !== undefined) {
-//         console.log(variable)
-//         clearInterval(checkInterval); // Stop checking
-//         resolve();
-//       }
-//     }, 1000); // Adjust the interval as needed
-//   });
-// }
+const waitForVariableToBeSet = (variable) => {
+  return new Promise((resolve, reject) => {
+    // Check the variable at regular intervals
+    const checkInterval = setInterval(() => {
+      if (variable !== undefined) {
+        console.log(variable)
+        clearInterval(checkInterval); // Stop checking
+        resolve();
+      }
+    }, 1000); // Adjust the interval as needed
+  });
+}
 
 try {
-  setup()
+  waitForVariableToBeSet(process.env.MEILISEARCH_URL).then(setup);
 } catch {
   console.warn('Meilisearch is not ready yet. Skipping indexing...');
 }

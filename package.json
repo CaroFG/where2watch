@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "setup && next dev",
+    "dev": "yarn setup && next dev",
     "build": "next build && yarn setup",
     "start": "next start",
     "lint": "eslint --ext .js .",
