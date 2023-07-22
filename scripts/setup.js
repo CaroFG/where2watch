@@ -74,7 +74,7 @@ const waitForVariableToBeSet = (variable, maxWaitTime) => {
 };
 
 try {
-  waitForVariableToBeSet(process.env.MEILISEARCH_URL, 60500).then(setup);
+  waitForVariableToBeSet(process.env.MEILISEARCH_URL, 300000).then(setup);
 } catch (e) {
   console.error(e);
 }
