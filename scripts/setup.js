@@ -2,13 +2,7 @@ const { MeiliSearch } = require('meilisearch')
 const moviesEn = require('../assets/movies-en-US.json')
 const moviesJp = require('../assets/movies-ja-JP.json')
 const moviesTh = require('../assets/movies-th-TH.json')
-
 require('dotenv').config()
-
-const client = new MeiliSearch({
-  host: process.env.MEILISEARCH_URL,
-  apiKey: process.env.MEILISEARCH_ADMIN_KEY,
-})
 
 const indexes = [
   {
@@ -39,6 +33,11 @@ const settings = {
 }
 
 const setup = async () => {
+  const client = new MeiliSearch({
+  host: process.env.MEILISEARCH_URL,
+  apiKey: process.env.MEILISEARCH_ADMIN_KEY,
+})
+
   await Promise.all(
     indexes.map(async index => {
       const currentIndex = client.index(index.indexName)
@@ -49,22 +48,33 @@ const setup = async () => {
   )
 }
 
+const waitForVariableToBeSet = (variable, maxWaitTime) => {
+  let resolved = false;
 
-const waitForVariableToBeSet = (variable) => {
   return new Promise((resolve, reject) => {
     // Check the variable at regular intervals
+    console.log('Waiting for environment variables to be set')
     const checkInterval = setInterval(() => {
       if (variable !== undefined) {
         console.log(variable)
         clearInterval(checkInterval); // Stop checking
-        resolve();
+        resolved = true;
+        resolve(variable);
       }
     }, 1000); // Adjust the interval as needed
+
+    // Set a timeout to reject the Promise if the maxWaitTime is exceeded
+    setTimeout(() => {
+      if (!resolved) {
+        clearInterval(checkInterval);
+        reject(new Error('Timeout: Variables not set within the maximum wait time.'));
+      }
+    }, maxWaitTime);
   });
-}
+};
 
 try {
-  waitForVariableToBeSet(process.env.MEILISEARCH_URL).then(setup);
-} catch {
-  console.warn('Meilisearch is not ready yet. Skipping indexing...');
+  waitForVariableToBeSet(process.env.MEILISEARCH_URL, 60500).then(setup);
+} catch (e) {
+  console.error(e);
 }
