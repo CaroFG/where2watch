@@ -1,24 +1,7 @@
 const { MeiliSearch } = require('meilisearch')
-const moviesEn = require('../assets/movies-en-US.json')
-const moviesJp = require('../assets/movies-ja-JP.json')
-const moviesTh = require('../assets/movies-th-TH.json')
-const watchTasks = require('./utils')
+const { watchTasks, checkData } = require('./utils')
+const indexes = require('./indexData')
 require('dotenv').config()
-
-const indexes = [
-  {
-    indexName: 'movies-en-US',
-    documents: moviesEn,
-  },
-  {
-    indexName: 'movies-ja-JP',
-    documents: moviesJp,
-  },
-  {
-    indexName: 'movies-th-TH',
-    documents: moviesTh,
-  },
-]
 
 const settings = {
   rankingRules: [
@@ -34,8 +17,8 @@ const settings = {
 }
 
 const credentials = {
-  host: process.env.MEILISEARCH_HOST,
-  apiKey: process.env.MEILISEARCH_ADMIN_KEY
+  host: process.env.MEILISEARCH_URL,
+  apiKey: process.env.MEILISEARCH_ADMIN_KEY,
 }
 
 const setup = async () => {
@@ -43,7 +26,7 @@ const setup = async () => {
     console.log('🚀 Seeding your Meilisearch instance')
 
     if (!credentials.host) {
-      throw new Error('Missing `MEILISEARCH_HOST` environment variable')
+      throw new Error('Missing `MEILISEARCH_URL` environment variable')
     }
 
     if (!credentials.apiKey) {
@@ -56,6 +39,12 @@ const setup = async () => {
       await client.health()
     } catch (error) {
       throw new Error('Meilisearch index is not ready. Skipping indexing...')
+    }
+
+    const docNumber = await checkData(client, indexes[0].indexName)
+
+    if (docNumber > 0) {
+      return 'Index already exists with data'
     }
 
     await Promise.all(
@@ -74,6 +63,10 @@ const setup = async () => {
   }
 }
 
-setup()
+const res = async () => {
+  let r = await setup()
+  console.log(r)
+}
+ res()
 
 module.exports = setup
