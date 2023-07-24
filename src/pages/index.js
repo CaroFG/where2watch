@@ -13,9 +13,10 @@ import MoviesList from 'blocks/MoviesList/index'
 import { LANGUAGES } from 'data/constants'
 import { LanguageProvider } from 'context/LanguageContext'
 import useLocalStorage from 'hooks/useLocalStorage'
+import DocumentProvisioning from 'components/DocumentsProvisioning'
 
-const MEILISEARCH_HOST = process.env.MEILISEARCH_URL || 'http://0.0.0.0:7700'
-const MEILISEARCH_API_KEY = process.env.MEILISEARCH_SEARCH_KEY || 'searchKey'
+const MEILISEARCH_URL = process.env.MEILISEARCH_URL || 'http://0.0.0.0:7700'
+const MEILISEARCH_SEARCH_KEY = process.env.MEILISEARCH_SEARCH_KEY || 'searchKey'
 
 const Wrapper = styled.div`
   @media (min-width: ${get('breakpoints.desktop')}) {
@@ -23,12 +24,13 @@ const Wrapper = styled.div`
   }
 `
 
-const Home = ({ host, apiKey }) => {
+const Home = ({ host, apiKey, needsIndexing }) => {
   const [localStorageCountry, setLocalStorageCountry] =
     useLocalStorage('country-preference')
   const { t } = useTranslation('common')
   const [client, setClient] = React.useState(null)
   const [selectedLanguage, setSelectedLanguage] = React.useState(null)
+  const [hasDocuments, setHasDocuments] = React.useState(false)
 
   const setSelectedCountry = React.useCallback(
     country => {
@@ -56,8 +58,24 @@ const Home = ({ host, apiKey }) => {
 
   if (!host || !apiKey) return <div>{t('connexionFailed')}</div>
 
+  React.useEffect(() => {
+    fetch('/api/stats')
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then((data) => {
+      (data.result === 0)? setHasDocuments(false) : setHasDocuments(true)
+    })
+    .catch((error) => {
+      console.error('Error fetching data:', error);
+    });
+  })
+
   return (
-    <ClientProvider value={{ client, setClient }}>
+    <ClientProvider value={{ client, setClient, needsIndexing }}>
       <LanguageProvider
         value={{ selectedLanguage, setSelectedLanguage: setSelectedCountry }}
       >
@@ -65,35 +83,35 @@ const Home = ({ host, apiKey }) => {
           <title>{t('title')}</title>
           <meta name="description" content={t('meta.description')} />
         </Head>
-        {client && (
-          <InstantSearch
-            indexName={selectedLanguage.indexName}
-            searchClient={client}
-          >
-            <Configure hitsPerPage={24} />
-            <Wrapper>
-              <Header />
-              <Filters />
-              <MoviesList />
-            </Wrapper>
-          </InstantSearch>
-        )}
+        {client &&
+          (hasDocuments ? (
+            <InstantSearch
+              indexName={selectedLanguage.indexName}
+              searchClient={client}
+            >
+              <Configure hitsPerPage={24} />
+              <Wrapper>
+                <Header />
+                <Filters />
+                <MoviesList />
+              </Wrapper>
+            </InstantSearch>
+          ) : (
+            <DocumentProvisioning />
+          ))}
       </LanguageProvider>
     </ClientProvider>
   )
 }
 
 export const getStaticProps = async ({ locale }) => {
-  try {
-    return {
-      props: {
-        host: MEILISEARCH_HOST,
-        apiKey: MEILISEARCH_API_KEY,
-        ...(await serverSideTranslations(locale, ['common'])),
-      },
-    }
-  } catch (err) {
-    console.log(err)
+  return {
+    props: {
+      host: MEILISEARCH_URL,
+      apiKey: MEILISEARCH_SEARCH_KEY,
+
+      ...(await serverSideTranslations(locale, ['common']))
+    },
   }
 }
 
