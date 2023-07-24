@@ -2,6 +2,7 @@ const { MeiliSearch } = require('meilisearch')
 const moviesEn = require('../assets/movies-en-US.json')
 const moviesJp = require('../assets/movies-ja-JP.json')
 const moviesTh = require('../assets/movies-th-TH.json')
+const watchTasks = require('./utils')
 require('dotenv').config()
 
 const indexes = [
@@ -32,49 +33,47 @@ const settings = {
   searchableAttributes: ['title'],
 }
 
+const credentials = {
+  host: process.env.MEILISEARCH_HOST,
+  apiKey: process.env.MEILISEARCH_ADMIN_KEY
+}
+
 const setup = async () => {
-  const client = new MeiliSearch({
-  host: process.env.MEILISEARCH_URL,
-  apiKey: process.env.MEILISEARCH_ADMIN_KEY,
-})
+  try {
+    console.log('🚀 Seeding your Meilisearch instance')
 
-  await Promise.all(
-    indexes.map(async index => {
-      const currentIndex = client.index(index.indexName)
-      await currentIndex.updateSettings(settings)
-      await currentIndex.addDocuments(index.documents)
-      console.log(`Documents added to ${index.indexName} index`)
-    })
-  )
+    if (!credentials.host) {
+      throw new Error('Missing `MEILISEARCH_HOST` environment variable')
+    }
+
+    if (!credentials.apiKey) {
+      throw new Error('Missing `MEILISEARCH_ADMIN_KEY` environment variable')
+    }
+
+    const client = new MeiliSearch(credentials)
+
+    try {
+      await client.health()
+    } catch (error) {
+      throw new Error('Meilisearch index is not ready. Skipping indexing...')
+    }
+
+    await Promise.all(
+      indexes.map(async index => {
+        const currentIndexName = index.indexName
+        const currentIndex = client.index(currentIndexName)
+        console.log(`Adding settings to \`${currentIndexName}\``)
+        await currentIndex.updateSettings(settings)
+        console.log(`Adding documents to \`${currentIndexName}\``)
+        await currentIndex.addDocuments(index.documents)
+        await watchTasks(client, currentIndexName)
+      })
+    )
+  } catch (error) {
+    console.error(error)
+  }
 }
 
-const waitForVariableToBeSet = (variable, maxWaitTime) => {
-  let resolved = false;
+setup()
 
-  return new Promise((resolve, reject) => {
-    // Check the variable at regular intervals
-    console.log('Waiting for environment variables to be set')
-    const checkInterval = setInterval(() => {
-      if (variable !== undefined) {
-        console.log(variable)
-        clearInterval(checkInterval); // Stop checking
-        resolved = true;
-        resolve(variable);
-      }
-    }, 1000); // Adjust the interval as needed
-
-    // Set a timeout to reject the Promise if the maxWaitTime is exceeded
-    setTimeout(() => {
-      if (!resolved) {
-        clearInterval(checkInterval);
-        reject(new Error('Timeout: Variables not set within the maximum wait time.'));
-      }
-    }, maxWaitTime);
-  });
-};
-
-try {
-  waitForVariableToBeSet(process.env.MEILISEARCH_URL, 300000).then(setup);
-} catch (e) {
-  console.error(e);
-}
+module.exports = setup
