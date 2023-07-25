@@ -107,8 +107,7 @@ export default function DocumentProvisioning() {
       <ContentWrapper>
         <Title>Almost ready!</Title>
         <Subtitle>
-          It looks like your Meilisearch index is not provisioned yet. Documents
-          could not be added during the first deployment.
+          It looks like your Meilisearch index doesn't have any documents yet.
         </Subtitle>
         <Button type="button" onClick={onClick} disabled={isSubmitting}>
           {isSubmitting ? 'Adding documents...' : 'Add documents'}
