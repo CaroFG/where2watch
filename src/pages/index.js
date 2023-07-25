@@ -13,7 +13,7 @@ import MoviesList from 'blocks/MoviesList/index'
 import { LANGUAGES } from 'data/constants'
 import { LanguageProvider } from 'context/LanguageContext'
 import useLocalStorage from 'hooks/useLocalStorage'
-import DocumentProvisioning from 'components/DocumentsProvisioning'
+import DocumentIndexer from 'components/DocumentIndexer'
 
 const MEILISEARCH_URL = process.env.MEILISEARCH_URL || 'http://0.0.0.0:7700'
 const MEILISEARCH_SEARCH_KEY = process.env.MEILISEARCH_SEARCH_KEY || 'searchKey'
@@ -97,7 +97,7 @@ const Home = ({ host, apiKey, needsIndexing }) => {
               </Wrapper>
             </InstantSearch>
           ) : (
-            <DocumentProvisioning />
+            <DocumentIndexer />
           ))}
       </LanguageProvider>
     </ClientProvider>

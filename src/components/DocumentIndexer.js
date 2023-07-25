@@ -8,7 +8,7 @@ const Container = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(to left, #f472b6, #a855f7, #5a67d8);
+  background: linear-gradient(to left, #3e1c6c, #2c075e, #270159);
 `
 
 const ContentWrapper = styled.div`
