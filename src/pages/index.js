@@ -80,7 +80,7 @@ const Home = ({ host, apiKey, needsIndexing }) => {
         value={{ selectedLanguage, setSelectedLanguage: setSelectedCountry }}
       >
         <Head>
-          <title>{t('title')}</title>
+          <title>{t('Meilisearch starter')}</title>
           <meta name="description" content={t('meta.description')} />
         </Head>
         {client &&
