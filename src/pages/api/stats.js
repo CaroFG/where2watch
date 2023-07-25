@@ -12,6 +12,6 @@ export default async function getStats(req, res) {
     const result = await checkData(client, indexes[0].indexName)
     res.status(200).json({ result })
   } catch (err) {
-    res.status(500).json({ error: 'failed to load data' })
+    res.status(500).json({ error: 'failed to load data', err })
   }
 }
