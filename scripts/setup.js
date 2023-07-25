@@ -67,6 +67,6 @@ const res = async () => {
   let r = await setup()
   console.log(r)
 }
- res()
+res()
 
 module.exports = setup

@@ -56,23 +56,23 @@ const Home = ({ host, apiKey, needsIndexing }) => {
       )
   }, [host, apiKey])
 
-  if (!host || !apiKey) return <div>{t('connexionFailed')}</div>
-
   React.useEffect(() => {
     fetch('/api/stats')
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then((data) => {
-      (data.result === 0)? setHasDocuments(false) : setHasDocuments(true)
-    })
-    .catch((error) => {
-      console.error('Error fetching data:', error);
-    });
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok')
+        }
+        return response.json()
+      })
+      .then(data => {
+        data.result === 0 ? setHasDocuments(false) : setHasDocuments(true)
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error)
+      })
   })
+
+  if (!host || !apiKey) return <div>{t('connexionFailed')}</div>
 
   return (
     <ClientProvider value={{ client, setClient, needsIndexing }}>
@@ -110,7 +110,7 @@ export const getStaticProps = async ({ locale }) => {
       host: MEILISEARCH_URL,
       apiKey: MEILISEARCH_SEARCH_KEY,
 
-      ...(await serverSideTranslations(locale, ['common']))
+      ...(await serverSideTranslations(locale, ['common'])),
     },
   }
 }

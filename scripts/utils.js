@@ -16,7 +16,7 @@ const checkData = async (client, indexName) => {
   try {
     const indexesObject = await client.getIndexes()
     const indexes = indexesObject.results
-    if (indexes && indexes.some((index) => index.uid === indexName)) {
+    if (indexes && indexes.some(index => index.uid === indexName)) {
       const firstIndexStats = await client.index(indexName).getStats()
       return firstIndexStats?.numberOfDocuments
     } else {
@@ -25,7 +25,6 @@ const checkData = async (client, indexName) => {
   } catch (e) {
     return e
   }
-
 }
 
 const utils = {
