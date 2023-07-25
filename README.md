@@ -6,7 +6,7 @@ A website that lets you know where to watch a movie built on [Next.js](https://n
 
 ## Deployment
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FCaroFG%2Fwhere2watch&project-name=startarrtar&repository-name=meilistartarrtar&integration-ids=oac_rwEl59xztJi8dRne84Aqaw1r)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FCaroFG%2Fwhere2watch&project-name=meilisearch-starter&repository-name=meilisearch-starter&integration-ids=oac_rwEl59xztJi8dRne84Aqaw1r)
 
 ## Demo
 
