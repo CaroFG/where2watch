@@ -1,6 +1,6 @@
 # Meilisearch Starter – Movies
 
-A developer directory built on [Next.js](https://nextjs.org/) and [Meilisearch](https://www.meilisearch.com), deployed on [Vercel](https://vercel.com/) with the [Vercel + Meilisearch integration](https://vercel.com/integrations/meilisearch).
+A website that lets you know where to watch a movie built on [Next.js](https://nextjs.org/) and [Meilisearch](https://www.meilisearch.com), deployed on [Vercel](https://vercel.com/) with the [Vercel + Meilisearch integration](https://vercel.com/integrations/meilisearch).
 
 -- todo add picture --
 
